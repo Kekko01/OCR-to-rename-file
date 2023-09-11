@@ -1,0 +1,37 @@
+{
+    "configs":
+    [
+        {
+            "name": "Config 1",
+            "description": "Description 1",
+            "in_dir": "dir\\in\\files",
+            "out_dir": "dir\\out\\files",
+            "dpi": 150,
+            "languages": ["it"],
+            "filename": "{FIELD1} {field2} - {Field3} some text.pdf",
+            "fields": [
+                {"name": "FIELD1", "left": 194, "top": 138, "right": 548, "bottom": 173},
+                {"name": "field2", "left": 549, "top": 141, "right": 1146, "bottom": 164},
+                {"name": "Field3", "left": 849, "top": 179, "right": 877, "bottom": 205}
+            ]
+        }
+        
+        ,
+
+        {
+            "name": "Config 2",
+            "description": "Description 2",
+            "in_dir": "dir\\in\\files",
+            "out_dir": "dir\\out\\files",
+            "dpi": 150,
+            "languages": ["fr", "en"],
+            "page": 1,
+            "filename": "{FIELD1} {field2} - {Field3} some text.pdf",
+            "fields": [
+                {"name": "FIELD1", "left": 194, "top": 138, "right": 548, "bottom": 173},
+                {"name": "field2", "left": 549, "top": 141, "right": 1146, "bottom": 164},
+                {"name": "Field3", "left": 849, "top": 179, "right": 877, "bottom": 205}
+            ]
+        }
+    ]
+}
