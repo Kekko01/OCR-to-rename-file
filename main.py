@@ -5,10 +5,59 @@
 
 import sys, json, os, tempfile
 
+def check_configs(configs):
+    for config in configs:
+        if not os.path.exists(config['in_dir']):
+            print(f"Error with {config['name']} configuration: input directory does not exist. Directory: {config['in_dir']}")
+            return False
+        if 'dpi' in config and (not isinstance(config['dpi'], int) or config['dpi'] <= 0):
+            print(f"Error with {config['name']} configuration: invalid value for dpi. Value: {config['dpi']}")
+            return False
+        lang_list = ['bn','as','mni', 'ru','rs_cyrillic','be','bg','uk','mn','abq','ady','kbd',
+                    'ava','dar','inh','che','lbe','lez','tab','tjk','hi','mr','ne','bh','mai','ang',
+                    'bho','mah','sck','new','gom','sa','bgc','th','ch_sim','ch_tra','ja','ko','ta','te','kn']
+        if 'languages' in config and not isinstance(config['languages'], list):
+            print(f"Error with {config['name']} configuration: invalid value for languages, languages must be a list! Value: {config['languages']}")
+            return False
+        for lang in config['languages']:
+            if lang not in lang_list:
+                print(f"Error with {config['name']} configuration: invalid value for language, check if language is supported. Value: {lang}")
+                if input('Do you want to open the page where there are all the supported languages? (y/n): ') == 'y':
+                    os.system(
+                        "open https://www.jaided.ai/easyocr/#:~:text=languages%20and%20expanding.-,Supported%20Languages,-Language"
+                    )
+                return False
+        for field in config['fields']:
+            if not isinstance(field['left'], int) or field['left'] < 0:
+                print(f"Error with {config['name']} configuration: invalid value for left. Value: {field['left']}")
+                return False
+            if not isinstance(field['top'], int) or field['top'] < 0:
+                print(f"Error with {config['name']} configuration: invalid value for top. Value: {field['top']}")
+                return False
+            if not isinstance(field['right'], int) or field['right'] < 0:
+                print(f"Error with {config['name']} configuration: invalid value for right. Value: {field['right']}")
+                return False
+            if not isinstance(field['bottom'], int) or field['bottom'] < 0:
+                print(f"Error with {config['name']} configuration: invalid value for bottom. Value: {field['bottom']}")
+                return False
+            if field['left'] >= field['right']:
+                print(f"Error with {config['name']} configuration: the left value cannot be larger than the right value!. Value left: {field['left']} Value right: {field['right']}")
+                return False
+            if field['top'] >= field['bottom']:
+                print(f"Error with {config['name']} configuration: the top value cannot be larger than the bottom value!. Value top: {field['top']} Value bottom: {field['bottom']}")
+                return False
+    return True
+
 def pdf_to_image(file_in, file_out, dpi=150, page=0):
     try:
         import fitz  # PyMuPDF
+        if not os.path.exists(file_in):
+            print(f"Error with {file_in}: file does not exist!")
+            return False
         pdf_document = fitz.open(file_in)
+        if page >= len(pdf_document):
+            print(f"Error with {file_in}: page {page} does not exist!")
+            return False
         pix = pdf_document[page].get_pixmap(dpi=dpi)
         pix.save(file_out)
         pdf_document.close()
@@ -47,8 +96,15 @@ if __name__ == '__main__':
     try:
         configs = json.load(open('config.json'))['configs']
     except:
-        print("Error: could not load config.json, please make sure it exists and is valid JSON.")
+        print("Error: could not load config.json, please make sure it exists JSON.")
         sys.exit(1)
+
+    """
+    Check configuration
+    """
+    if not check_configs(configs):
+        sys.exit(1)
+
     print("Welcome to OCR to rename file!\n")
     use_gpu = bool(sys.argv[2]) if len(sys.argv) > 2 else True
     if len(sys.argv) > 1:
@@ -128,11 +184,14 @@ if __name__ == '__main__':
 
                 new_name = new_name.replace("{" + field['name'] + "}", fields_for_filename[field['name']])
             print(f"New filename: {new_name}")
-            try:
-                os.rename(os.path.join(current_config['in_dir'], file), os.path.join(current_config['out_dir'], new_name))
-                print(f"File saved in: {current_config['out_dir']}")
-            except:
-                print(f"Error: could not convert image to PDF. Filename: {file}")
+            if os.path.exists(os.path.join(current_config['out_dir'], new_name)):
+                print(f"Error: file already exists. Filename: {file}")
+                continue
+            if not os.path.exists(os.path.join(current_config['out_dir'])):
+                os.makedirs(os.path.join(current_config['out_dir']))
+                print(f"Directory created: {current_config['out_dir']}")
+            os.rename(os.path.join(current_config['in_dir'], file), os.path.join(current_config['out_dir'], new_name))
+            print(f"File saved in: {current_config['out_dir']}")
         except:
             print(f"Error: could not rename file. Filename: {file}")
 
