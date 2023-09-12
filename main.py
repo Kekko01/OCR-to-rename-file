@@ -97,12 +97,14 @@ if __name__ == '__main__':
         configs = json.load(open('config.json'))['configs']
     except:
         print("Error: could not load config.json, please make sure it exists JSON.")
+        input()
         sys.exit(1)
 
     """
     Check configuration
     """
     if not check_configs(configs):
+        input()
         sys.exit(1)
 
     print("Welcome to OCR to rename file!\n")
@@ -112,6 +114,7 @@ if __name__ == '__main__':
             current_config = configs[int(sys.argv[1])]
         except:
             print("Error: could not find configuration for", sys.argv[1], "in config.json, please make sure it exists and is valid JSON.")
+            input()
             sys.exit(1)
     else:
         print("Please select a configuration:")
@@ -122,6 +125,7 @@ if __name__ == '__main__':
             current_config = configs[int(input())]
         except:
             print("Error: invalid input, please enter a valid number.")
+            input()
             sys.exit(1)
     print(f"Loaded configuration: {current_config['name']}: {current_config['description']}")
 
@@ -196,5 +200,8 @@ if __name__ == '__main__':
             print(f"Error: could not rename file. Filename: {file}")
 
         os.remove(image_to_scan)
-            
+
+    print("All files processed!")
+    input()
+    sys.exit(0)
             
