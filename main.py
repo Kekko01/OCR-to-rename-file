@@ -13,19 +13,21 @@ def check_configs(configs):
         if 'dpi' in config and (not isinstance(config['dpi'], int) or config['dpi'] <= 0):
             print(f"Error with {config['name']} configuration: invalid value for dpi. Value: {config['dpi']}")
             return False
-        lang_list = ['bn','as','mni', 'ru','rs_cyrillic','be','bg','uk','mn','abq','ady','kbd',
-                    'ava','dar','inh','che','lbe','lez','tab','tjk','hi','mr','ne','bh','mai','ang',
-                    'bho','mah','sck','new','gom','sa','bgc','th','ch_sim','ch_tra','ja','ko','ta','te','kn']
+        lang_list = ["abq", "ady", "af", "ang", "ar", "as", "ava", "az", "be", "bg", "bh", "bho", "bn", "bs", "ch_sim",
+                    "ch_tra", "che", "cs", "cy", "da", "dar", "de", "en", "es", "et", "fa", "fr", "ga", "gom", "hi",
+                    "hr", "hu", "id", "inh", "is", "it", "ja", "kbd", "kn", "ko", "ku", "la", "lbe", "lez", "lt",
+                    "lv", "mah", "mai", "mi", "mn", "mr", "ms", "mt", "ne", "new", "nl", "no", "oc", "pi", "pl",
+                    "pt", "ro", "ru", "rs_cyrillic", "rs_latin", "sck", "sk", "sl", "sq", "sv", "sw", "ta", "tab",
+                    "te", "th", "tjk", "tl", "tr", "ug", "uk", "ur", "uz", "vi",]
         if 'languages' in config and not isinstance(config['languages'], list):
             print(f"Error with {config['name']} configuration: invalid value for languages, languages must be a list! Value: {config['languages']}")
             return False
         for lang in config['languages']:
             if lang not in lang_list:
                 print(f"Error with {config['name']} configuration: invalid value for language, check if language is supported. Value: {lang}")
-                if input('Do you want to open the page where there are all the supported languages? (y/n): ') == 'y':
-                    os.system(
-                        "open https://www.jaided.ai/easyocr/#:~:text=languages%20and%20expanding.-,Supported%20Languages,-Language"
-                    )
+                if input('Do you want to open the page where there are all the supported languages? (y/n): ').lower() == 'y':
+                    import webbrowser
+                    webbrowser.open('https://www.jaided.ai/easyocr/#:~:text=languages%20and%20expanding.-,Supported%20Languages,-Language')
                 return False
         for field in config['fields']:
             if not isinstance(field['left'], int) or field['left'] < 0:
